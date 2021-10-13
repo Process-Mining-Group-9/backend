@@ -40,4 +40,3 @@ The WebSocket API provides the actual models of the processes and live instances
 
 ### Technologies
 * [websockets](https://pypi.org/project/websockets/): WebSocket library for Python
-* 
