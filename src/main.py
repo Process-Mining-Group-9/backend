@@ -37,6 +37,9 @@ if __name__ == '__main__':
     config: dict = yaml.safe_load(open('../config.yaml'))
     setup_logging(config['log'])
     logging.info('Initializing application processes')
+
     mqtt_db_recv, mqtt_db_send = Pipe(duplex=False)
+
+
     setup_mqtt(mqtt_db_send, config['mqtt'])
     setup_db(mqtt_db_recv, config['db'])
