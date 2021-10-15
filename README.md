@@ -1,3 +1,6 @@
+![Docker Image CI](https://github.com/Process-Mining-Group-9/backend/actions/workflows/docker-image.yml/badge.svg)
+![MyPy Check](https://github.com/Process-Mining-Group-9/backend/actions/workflows/mypy.yml/badge.svg)
+
 # Architecture
 
 ## Recording of event logs
