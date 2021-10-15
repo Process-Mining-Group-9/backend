@@ -6,6 +6,7 @@ ENV PIP_NO_CACHE_DIR=1
 WORKDIR /code
 
 COPY requirements.txt .
+COPY config.yaml .
 
 RUN pip install -r requirements.txt
 

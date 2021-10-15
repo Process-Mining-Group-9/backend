@@ -1,5 +1,18 @@
-[![Docker Image CI](https://github.com/Process-Mining-Group-9/backend/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Process-Mining-Group-9/backend/actions/workflows/docker-image.yml)
 [![MyPy Check](https://github.com/Process-Mining-Group-9/backend/actions/workflows/mypy.yml/badge.svg)](https://github.com/Process-Mining-Group-9/backend/actions/workflows/mypy.yml)
+
+# Installation and Running
+
+**Note:** Due to the use of the ```multiprocessing``` package, logging doesn't properly work on Windows.
+
+1. Create a virtual environment with ```python -m venv venv``` and activate it: ```source venv/bin/activate```
+2. Install the required packages: ```pip install -r requirements.txt```
+3. Run ```pip install -e .```
+4. Cd into the source directory: ```cd src```
+5. Run the application: ```python main.py```
+
+## Type Checking
+
+Use ```mypy src``` to type-check the code.
 
 # Architecture
 

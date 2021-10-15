@@ -1,31 +1,32 @@
+import logging
+import typing
 import paho.mqtt.client as mqtt
+from src.classes.mqtt_event import MqttEvent
 
 
 class MQTT:
     def on_connect(self, client: mqtt.Client, userdata, flags, rc):
-        print("Connected with result code " + str(rc))
-        print('Subscribing to ' + self.config['base_topic'])
+        logging.info(f'Connected with result code {rc}')
         client.subscribe(self.config['base_topic'])
 
     def on_message(self, client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
-        hierarchy: list[str] = msg.topic.split('/')
+        hierarchy: typing.List[str] = msg.topic.split('/')
         if len(hierarchy) == 4:
-            assignment = {
-                'base': hierarchy[0],
-                'source_id': hierarchy[1],
-                'process_id': hierarchy[2],
-                'activity': hierarchy[3]
-            }
-
-            print(f'Observed event with assignment: {assignment}; Payload: {msg.payload}')
-            self.pipe.send((assignment, msg.payload.decode()))
+            event = MqttEvent(hierarchy[0], hierarchy[1], hierarchy[2], hierarchy[3], msg.payload.decode())
+            logging.info(f'Sending observed event on topic {msg.topic} to database. Event: "{event}"')
+            self.pipe.send(event)
+        else:
+            logging.warning(f'Ignoring event with non-matching topic structure: {msg.topic}.')
 
     def start(self):
         client = mqtt.Client()
         client.on_connect = self.on_connect
         client.on_message = self.on_message
 
-        client.connect(self.config['broker'], self.config['port'], 60)
+        broker = self.config['broker']
+        port = self.config['port']
+        logging.info(f'Connecting to MQTT Broker "{broker}" on Port {port}')
+        client.connect(broker, port, 60)
         client.loop_forever()
 
     def __init__(self, pipe_to_db, config: dict):

@@ -1,3 +1,7 @@
+log:
+  file: "../log/app.log"
+  level: 20
+  format: "%(asctime)s - (%(module)s:%(funcName)s:Line %(lineno)d) - (%(processName)s:%(process)d) - %(levelname)s - %(message)s"
 mqtt:
   broker: "broker.hivemq.com"
   port: 1883
