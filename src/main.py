@@ -1,45 +1,33 @@
-from multiprocessing import Process, Pipe
-from db.db import Database
-from mqtt.mqtt import MQTT
-import os
-import multiprocessing_logging
-import logging
+from mqtt_event import MqttEvent
+from paho.mqtt.client import Client, MQTTMessage
 import yaml
+import typing
+
+config: dict = yaml.safe_load(open('../config.yaml'))
 
 
-def setup_logging(log_config: dict):
-    file: str = log_config['file']
-    log_format: str = log_config['format']
-    level: int = log_config['level']
-    os.makedirs(os.path.dirname(file), exist_ok=True)
-    logging.basicConfig(filename=file, format=log_format, level=level)
-
-    stream_handler = logging.StreamHandler()
-    stream_handler.formatter = logging.Formatter(log_format)
-    logging.getLogger().addHandler(stream_handler)
-
-    multiprocessing_logging.install_mp_handler()
+def on_connect(_client: Client, userdata, flags, rc):
+    print(f'Connected with result code {rc}')
+    _client.subscribe(config['mqtt']['base_topic'])
 
 
-def setup_mqtt(send_pipe, mqtt_config: dict):
-    client = MQTT(send_pipe, mqtt_config)
-    proc = Process(target=client.start)
-    proc.start()
-
-
-def setup_db(recv_pipe, db_config: dict):
-    db = Database(recv_pipe, db_config)
-    proc = Process(target=db.start)
-    proc.start()
+def on_message(_client: Client, userdata, msg: MQTTMessage):
+    hierarchy: typing.List[str] = msg.topic.split('/')
+    if len(hierarchy) == 4:
+        event = MqttEvent(base=hierarchy[0], source=hierarchy[1], process=hierarchy[2],
+                          activity=hierarchy[3], payload=msg.payload.decode())
+        print(f'Sending observed event on topic {msg.topic} to database. Event: "{event}"')
+        # TODO: Implement async request queue to newly built DB API, and add decent logging as in the other project
+    else:
+        print(f'Ignoring event with non-matching topic structure: {msg.topic}.')
 
 
 if __name__ == '__main__':
-    config: dict = yaml.safe_load(open('../config.yaml'))
-    setup_logging(config['log'])
-    logging.info('Initializing application processes')
+    client = Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    broker = config['mqtt']['broker']
+    port = config['mqtt']['port']
+    client.connect(broker, port, 60)
+    client.loop_forever()
 
-    mqtt_db_recv, mqtt_db_send = Pipe(duplex=False)
-
-
-    setup_mqtt(mqtt_db_send, config['mqtt'])
-    setup_db(mqtt_db_recv, config['db'])
