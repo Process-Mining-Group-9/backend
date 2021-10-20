@@ -2,19 +2,15 @@
 
 # Installation and Running
 
-**Note:** Due to the use of the ```multiprocessing``` package, logging doesn't properly work on Windows.
+Install the required packages using ```pip install -r requirements.txt```.
 
-1. Create a virtual environment with ```python -m venv venv``` and activate it: ```source venv/bin/activate```
-2. Install the required packages: ```pip install -r requirements.txt```
-3. Run ```pip install -e .```
-4. Cd into the source directory: ```cd src```
-5. Run the application: ```python main.py```
+```cd``` into the ```src``` directory and run ```python main.py```
 
 ## Type Checking
 
 Use ```mypy src``` to type-check the code.
 
-# Architecture
+# General Project Architecture
 
 ## Recording of event logs
 Event logs are published to a broker using the MQTT protocol, to which the backend service subscribes to. Each time a new event is published, the backend captures it, stores it, analyzes it, and shows it in a live view. It supports multiple log streams at once. The MQTT infrastructure is based on [Burattin et al.](https://orbit.dtu.dk/en/publications/mqtt-xes-real-time-telemetry-for-process-event-data)
