@@ -3,4 +3,4 @@ mqtt:
   port: 1883
   base_topic: "02269_pm_group9/#"
 db:
-  address: "localhost:8000"
+  address: "http://localhost:8000"

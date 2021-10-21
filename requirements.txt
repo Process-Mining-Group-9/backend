@@ -3,3 +3,4 @@ mypy==0.910
 PyYAML==6.0
 types-PyYAML==5.4.12
 pydantic==1.8.2
+httpx==0.20.0
