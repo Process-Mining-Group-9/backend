@@ -4,3 +4,7 @@ mqtt:
   base_topic: "02269_pm_group9/#"
 db:
   address: "http://localhost:8000"
+log:
+  file: "../log/app.log"
+  level: 20
+  format: "%(levelname).8s %(asctime)s - %(module)s:%(funcName)s:%(lineno)d - %(message)s"

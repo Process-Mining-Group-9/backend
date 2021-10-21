@@ -11,7 +11,7 @@ class MqttEvent(BaseModel):
 
     def to_dict(self) -> dict:
         return {'base': self.base, 'source': self.source, 'process': self.process,
-                'activity': self.activity,'payload': self.payload}
+                'activity': self.activity, 'payload': self.payload}
 
     def __str__(self) -> str:
         return f'{self.base}/{self.source}/{self.process}/{self.activity}: {self.payload}'
