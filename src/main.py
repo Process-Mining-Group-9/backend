@@ -2,11 +2,12 @@ from mqtt_event import MqttEvent
 from paho.mqtt.client import Client, MQTTMessage
 from multiprocessing import Process, Queue
 import multiprocessing_logging
+import os
 import yaml
 import typing
 import logging
-import os
-import time
+import json
+import arrow
 import sender
 
 config: dict = yaml.safe_load(open('../config.yaml'))
@@ -21,9 +22,10 @@ def on_connect(_client: Client, userdata, flags, rc) -> None:
 def on_message(_client: Client, userdata, msg: MQTTMessage) -> None:
     hierarchy: typing.List[str] = msg.topic.split('/')
     if len(hierarchy) == 4:
-        event = MqttEvent(timestamp=int(time.time()), base=hierarchy[0], source=hierarchy[1],
-                          process=hierarchy[2], activity=hierarchy[3], payload=msg.payload.decode())
-        logging.info(f'Notifying miner with observed event: "{event}"')
+        payload: dict = json.loads(msg.payload.decode())
+        event = MqttEvent(timestamp=payload['timestamp'] if 'timestamp' in payload else arrow.utcnow().timestamp(),
+                          base=hierarchy[0], source=hierarchy[1], process=hierarchy[2],
+                          activity=hierarchy[3], payload=msg.payload.decode())
         event_queue.put(event, block=True, timeout=10)
     else:
         logging.warning(f'Ignoring event with non-matching topic structure: {msg.topic}')
