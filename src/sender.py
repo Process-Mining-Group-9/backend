@@ -10,7 +10,7 @@ def start(queue: Queue, address: str):
         if not queue.empty():
             event: MqttEvent = queue.get(block=True, timeout=10)
             result = httpx.post(address + '/notify', json=event.to_dict())
-            logging.info(f'Notified miner of new event with result: {result}')
+            logging.info(f'Notified miner of new event with result: {result}. Event: {event}')
         else:
             sleep(0.01)
 
