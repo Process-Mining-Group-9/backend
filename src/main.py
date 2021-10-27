@@ -22,7 +22,7 @@ def on_connect(_client: Client, userdata, flags, rc) -> None:
 def on_message(_client: Client, userdata, msg: MQTTMessage) -> None:
     hierarchy: typing.List[str] = msg.topic.split('/')
     if len(hierarchy) == 4:
-        payload: dict = json.loads(msg.payload.decode())
+        payload: dict = json.loads(msg.payload.decode()) if msg.payload else dict()
         event = MqttEvent(timestamp=payload['timestamp'] if 'timestamp' in payload else arrow.utcnow().timestamp(),
                           base=hierarchy[0], source=hierarchy[1], process=hierarchy[2],
                           activity=hierarchy[3], payload=msg.payload.decode())
