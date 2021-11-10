@@ -15,8 +15,8 @@ event_queue = Queue()
 
 
 def on_connect(_client: Client, userdata, flags, rc) -> None:
-    logging.info(f'Connected with result code {rc}')
     _client.subscribe(config['mqtt']['base_topic'])
+    logging.info(f'Connected to {config["mqtt"]["broker"]}:{config["mqtt"]["port"]} on topic {config["mqtt"]["base_topic"]} with result code {rc}')
 
 
 def on_message(_client: Client, userdata, msg: MQTTMessage) -> None:
