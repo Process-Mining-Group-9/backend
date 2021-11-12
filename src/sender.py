@@ -14,7 +14,7 @@ def start(queue: Queue, address: str):
                 if result.is_success:
                     logging.info(f'Notified miner of new event with result: {result}. Event: {event}')
                 else:
-                    raise Exception(f'Unsuccessful notify: {result}')
+                    raise Exception(f'Unsuccessful notify: {result}. Message: {result.text}')
             except Exception as e:
                 logging.error(f'Exception while trying to notify miner of event. Exception: {e}. Event: {event}')
                 queue.put(event, block=True, timeout=10)  # Put it back at the end of the queue and try again later
