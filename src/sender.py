@@ -3,6 +3,7 @@ from time import sleep
 from mqtt_event import MqttEvent
 import httpx
 import logging
+import os
 
 
 def start(queue: Queue, address: str):
@@ -10,7 +11,7 @@ def start(queue: Queue, address: str):
         if not queue.empty():
             event: MqttEvent = queue.get(block=True, timeout=10)
             try:
-                result = httpx.post(address + '/notify', json=event.to_dict())
+                result = httpx.post(address + '/notify', json=event.to_dict(), headers={'X-Secret': os.environ['SECRET']})
                 if result.is_success:
                     logging.info(f'Notified miner of new event with result: {result}. Event: {event}')
                 else:
