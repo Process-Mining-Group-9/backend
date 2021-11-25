@@ -23,4 +23,3 @@ def start(event_list: List, address: str):
                 logging.debug(f'Events remaining in Queue: {len(event_list)}')
         else:
             sleep(0.1)  # Sleep for a bit to avoid constant evaluation of queue
-

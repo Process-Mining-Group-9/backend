@@ -27,6 +27,7 @@ def on_message(_client: Client, userdata, msg: MQTTMessage) -> None:
                           activity=hierarchy[3], payload=msg.payload.decode())
         global event_list
         event_list.append(event)
+        logging.info(f'Received event and added to notification queue. Currently in queue: {len(event_list)}')
     else:
         logging.warning(f'Ignoring event with non-matching topic structure: {msg.topic}')
 
