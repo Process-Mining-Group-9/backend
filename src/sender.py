@@ -1,27 +1,27 @@
-from multiprocessing import Queue
-from time import sleep
 from mqtt_event import MqttEvent
+from typing import List
+from time import sleep
 import httpx
 import logging
 import os
 
 
-def start(queue: Queue, address: str):
+def start(event_list: List, address: str):
     while True:
-        if not queue.empty():
-            event: MqttEvent = queue.get(block=True, timeout=10)
+        if event_list:
+            event: MqttEvent = event_list[0]
             try:
                 result = httpx.post(address + '/notify', json=event.to_dict(), headers={'X-Secret': os.environ['SECRET']})
                 if result.is_success:
                     logging.info(f'Notified miner of new event with result: {result}. Event: {event}')
+                    del event_list[0]
                 else:
                     raise Exception(f'Unsuccessful notify: {result}. Message: {result.text}')
             except Exception as e:
                 logging.error(f'Exception while trying to notify miner of event. Exception: {e}. Event: {event}')
-                queue.put(event, block=True, timeout=10)  # Put it back at the end of the queue and try again later
                 sleep(1)
             finally:
-                logging.debug(f'Events remaining in Queue: {queue.qsize()}')
+                logging.debug(f'Events remaining in Queue: {len(event_list)}')
         else:
             sleep(0.1)  # Sleep for a bit to avoid constant evaluation of queue
 

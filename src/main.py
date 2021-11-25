@@ -1,15 +1,16 @@
-from mqtt_event import MqttEvent
 from paho.mqtt.client import Client, MQTTMessage
-from multiprocessing import Process, Queue
-import multiprocessing_logging
-import os
-import typing
-import logging
-import json
-import arrow
-import sender
+from multiprocessing import Process, Manager
+from mqtt_event import MqttEvent
+from typing import List
 
-event_queue = Queue()
+import multiprocessing_logging
+import logging
+import sender
+import arrow
+import json
+import os
+
+event_list: List = []
 
 
 def on_connect(_client: Client, userdata, flags, rc) -> None:
@@ -18,13 +19,14 @@ def on_connect(_client: Client, userdata, flags, rc) -> None:
 
 
 def on_message(_client: Client, userdata, msg: MQTTMessage) -> None:
-    hierarchy: typing.List[str] = msg.topic.split('/')
+    hierarchy: List[str] = msg.topic.split('/')
     if len(hierarchy) == 4:
         payload: dict = json.loads(msg.payload.decode()) if msg.payload else dict()
         event = MqttEvent(timestamp=payload['timestamp'] if 'timestamp' in payload else arrow.utcnow().timestamp(),
                           base=hierarchy[0], source=hierarchy[1], process=hierarchy[2],
                           activity=hierarchy[3], payload=msg.payload.decode())
-        event_queue.put(event, block=True, timeout=10)
+        global event_list
+        event_list.append(event)
     else:
         logging.warning(f'Ignoring event with non-matching topic structure: {msg.topic}')
 
@@ -54,14 +56,17 @@ def setup_mqtt_client() -> Client:
 
 
 def setup_event_sender() -> Process:
-    sender_process = Process(target=sender.start, args=(event_queue, os.environ['MINER_ADDRESS']))
+    global event_list
+    event_list = manager.list()
+    sender_process = Process(target=sender.start, args=(event_list, os.environ['MINER_ADDRESS']))
     sender_process.start()
     return sender_process
 
 
 if __name__ == '__main__':
-    setup_logging()
-    mqtt_client = setup_mqtt_client()
-    sender = setup_event_sender()
-    mqtt_client.loop_forever()  # Blocks forever
+    with Manager() as manager:
+        setup_logging()
+        mqtt_client = setup_mqtt_client()
+        sender = setup_event_sender()
+        mqtt_client.loop_forever()  # Blocks forever
 
