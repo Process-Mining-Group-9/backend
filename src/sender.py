@@ -18,8 +18,7 @@ def start(event_list: List, address: str):
                 else:
                     raise Exception(f'Unsuccessful notify: {result}. Message: {result.text}')
             except Exception as e:
-                logging.error(f'Exception while trying to notify miner of event. Exception: {e}. Event: {event}')
-                sleep(1)
+                logging.error(f'Exception while trying to notify miner of event. Exception: {e}. Event: {event}. Remaining: {len(event_list)}')
             finally:
                 logging.debug(f'Events remaining in Queue: {len(event_list)}')
         else:

@@ -14,7 +14,7 @@ event_list: List = []
 
 
 def on_connect(_client: Client, userdata, flags, rc) -> None:
-    _client.subscribe(os.environ['MQTT_BASE_TOPIC'])
+    _client.subscribe(os.environ['MQTT_BASE_TOPIC'], qos=2)
     logging.info(f'Connected to {os.environ["MQTT_BROKER"]}:{os.environ["MQTT_PORT"]} on topic {os.environ["MQTT_BASE_TOPIC"]} with result code {rc}')
 
 
