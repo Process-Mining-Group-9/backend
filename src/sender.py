@@ -20,6 +20,6 @@ def start(event_list: List, address: str):
             except Exception as e:
                 logging.error(f'Exception while trying to notify miner of event. Exception: {e}. Event: {event}. Remaining: {len(event_list)}')
             finally:
-                logging.debug(f'Events remaining in Queue: {len(event_list)}')
+                logging.info(f'Events remaining in Queue: {len(event_list)}')
         else:
             sleep(0.1)  # Sleep for a bit to avoid constant evaluation of queue
