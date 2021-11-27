@@ -2,7 +2,7 @@
 
 # Installation and Running
 
-1. Check that your Python version is relatively new (```python --version```). Version 3.10 is used in production.
+1. Check that your Python version is relatively new (```python --version```). Version 3.8 is used in production.
 2. Create a virtual environment using ```python -m venv venv``` and activate it:
    1. On Linux: ```source venv\bin\activate```
    2. On Windows: ```\venv\Scripts\activate```
