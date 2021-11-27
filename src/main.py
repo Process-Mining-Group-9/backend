@@ -1,6 +1,7 @@
 from paho.mqtt.client import Client, MQTTMessage
 from multiprocessing import Process, Manager
 from mqtt_event import MqttEvent
+from dotenv import load_dotenv
 from typing import List
 
 import multiprocessing_logging
@@ -9,6 +10,8 @@ import sender
 import arrow
 import json
 import os
+
+load_dotenv()
 
 event_list: List = []
 
